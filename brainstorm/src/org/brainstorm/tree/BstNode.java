@@ -2,6 +2,7 @@ package org.brainstorm.tree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Enumeration;
+import javax.swing.tree.TreeNode;
 
 /**
  * @author Francois Tadel
@@ -15,8 +16,15 @@ public class BstNode extends DefaultMutableTreeNode {
     boolean m_enabled = true;
     boolean m_marked = false;
     int     m_modifier = 0;
+    boolean m_isVisible = true;
 
     // Constructor
+    public BstNode(){
+        m_nodeType      = new String("");
+        m_nodeComment   = new String("");
+        m_fileName      = new String("");
+    }
+    
     public BstNode(String nodeType, String nodeComment){
         m_nodeType      = new String(nodeType);
         m_nodeComment   = new String(nodeComment);
@@ -96,6 +104,13 @@ public class BstNode extends DefaultMutableTreeNode {
     }
     public void setModifier(int mod){
         this.m_modifier = mod;
+    }
+    
+    public boolean isVisible() {
+        return m_isVisible;
+    }
+    public void setVisible(boolean isVisible) {
+        m_isVisible = isVisible;
     }
     
     public String toString(){
@@ -461,6 +476,44 @@ public class BstNode extends DefaultMutableTreeNode {
                 }
             }
         }
+    }
+    
+    // Reimplement builtin functions with node filter
+    public TreeNode getChildAt(int index, boolean filterIsActive) {
+        if (!filterIsActive)
+            return super.getChildAt(index);
+        if (children == null)
+            throw new ArrayIndexOutOfBoundsException("node has no children");
+
+        int realIndex = -1;
+        int visibleIndex = -1;
+        Enumeration e = children.elements();
+        
+        while (e.hasMoreElements()) {
+            BstNode node = (BstNode) e.nextElement();
+            if (node.isVisible())
+                visibleIndex++;
+            realIndex++;
+            if (visibleIndex == index)
+                return (TreeNode) children.elementAt(realIndex);
+        }
+
+        throw new ArrayIndexOutOfBoundsException("index unmatched");
+    }
+    
+    public int getChildCount(boolean filterIsActive) {
+        if (children == null)
+            return 0;
+
+        int count = 0;
+        Enumeration e = children.elements();
+        while (e.hasMoreElements()) {
+            BstNode node = (BstNode) e.nextElement();
+            if (node.isVisible())
+                count++;
+        }
+
+        return count;
     }
 }
 

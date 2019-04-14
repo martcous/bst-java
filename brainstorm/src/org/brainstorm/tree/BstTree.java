@@ -120,7 +120,26 @@ public class BstTree extends JTree {
         }
         return listNodes;
     }
+    
+    // ===== FILTER =====
+    public void filter(BstNodeFilter filterNode) {
+        BstTreeModel model = (BstTreeModel) getModel();
+        model.setFilter(filterNode);
+        model.applyFilter();
+        model.reload();
+    }
+    
+    // ===== EXPAND ALL NODES =====
+    public void expandAllNodes() {
+        expandAllNodes(0, this.getRowCount());
+    }
+    private void expandAllNodes(int startingIndex, int rowCount) {
+        for(int i = startingIndex; i < rowCount; i++)
+            this.expandRow(i);
 
+        if(this.getRowCount() != rowCount)
+            expandAllNodes(rowCount, this.getRowCount());
+    }
 }
 
 

@@ -27,7 +27,7 @@ public class TestClass {
         
         // ==== CREATE TREE ====
         // Create a tree
-        final BstTree treeDrag = new BstTree(1.5f, 6, "Arial");
+        final BstTree treeDrag = new BstTree(1.5f, 12, "Arial");
         treeDrag.setEditable(true);
         treeDrag.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         // Enable drag'n'drop
@@ -35,18 +35,22 @@ public class TestClass {
         treeDrag.setTransferHandler(new TreeDragTransferHandler());
         // Create tree nodes
         BstNode nodeRoot = (BstNode) treeDrag.getModel().getRoot();
-        final BstNode subject1 = new BstNode( "condition", "Subject #1", "C:\\SUBJECTS\\brainstormsubject.mat", 1, 1, 37774);
+        final BstNode subject1 = new BstNode( "subject", "Subject #1", "C:\\SUBJECTS\\brainstormsubject.mat", 1, 1, 37774);
             BstNode bstNode = new BstNode( "studysubject", "Anatomy", "C:\\SUBJECTS\\test.mri", 1, 1, 37774);
             bstNode.setMarked(true);
+            BstNode cond1 = new BstNode( "condition", "S01_notch", "C:\\STUDIES\\brainstorm_study.bin", 1, 1, 37774);
+            subject1.add(new BstNode( "condition", "S01_notch", "C:\\STUDIES\\brainstorm_study.bin", 1, 1, 37774));
+            BstNode cond2 = new BstNode( "condition", "S01_notch2", "C:\\STUDIES\\brainstorm_study.bin", 1, 1, 37774);
+            subject1.add(cond2);
             subject1.add(bstNode);
-            subject1.add(new BstNode( "defaultstudy", "Trial 1", "C:\\STUDIES\\brainstorm_study.bin", 1, 1, 37774));
-            subject1.add(new BstNode( "defaultanat", "(Default anatomy)", "", 0, 0));
-            subject1.add(new BstNode( "timefreq", "Data1", "C:\\SUBJECTS\\timefreq_sss.mri", 1, 3));
-            subject1.add(new BstNode( "timefreq", "Data2", "C:\\SUBJECTS\\timefreq_hilbert.mri", 1, 3, 1));
-            subject1.add(new BstNode( "spectrum", "Data1", "C:\\SUBJECTS\\timefreq_sss.mri", 1, 3));
-            subject1.add(new BstNode( "spectrum", "Data2", "C:\\SUBJECTS\\timefreq_fft.mri", 1, 3, 1));
-            subject1.add(new BstNode( "result", "Exemple defaut", "C:\\SUBJECTS\\tata.mri", 1, 3));
-            subject1.add(new BstNode( "link", "Linl", "link|resultsfile|datafile", 1, 3));
+            cond1.add(new BstNode( "defaultstudy", "Trial 1", "C:\\STUDIES\\brainstorm_study.bin", 1, 1, 37774));
+            cond1.add(new BstNode( "defaultanat", "(Default anatomy)", "", 0, 0));
+            cond1.add(new BstNode( "timefreq", "Data1", "C:\\SUBJECTS\\timefreq_sss.mri", 1, 3));
+            cond1.add(new BstNode( "timefreq", "Data2", "C:\\SUBJECTS\\timefreq_hilbert.mri", 1, 3, 1));
+            cond2.add(new BstNode( "spectrum", "Data1", "C:\\SUBJECTS\\timefreq_sss.mri", 1, 3));
+            cond2.add(new BstNode( "spectrum", "Data2", "C:\\SUBJECTS\\timefreq_fft.mri", 1, 3, 1));
+            cond2.add(new BstNode( "result", "Exemple defaut", "C:\\SUBJECTS\\tata.mri", 1, 3));
+            cond2.add(new BstNode( "link", "Linl", "link|resultsfile|datafile", 1, 3));
             subject1.sortChildren();
             subject1.add(new BstNode( "presults", "(Cortex)", "C:\\SUBJECTS\\surface_tess.mat", 1, 1));
             BstNode bstN5 = new BstNode( "headmodel", "Exemple defaut", "C:\\SUBJECTS\\tata.mri", 1, 3);
@@ -72,12 +76,20 @@ public class TestClass {
         splitPanel.setDividerLocation(200);
         f.add(splitPanel);
         // Test button
-        JButton jButtonTest = new JButton("Test");
-        f.add(jButtonTest, BorderLayout.SOUTH);
+        JPanel btnPanel = new JPanel();
+        final JTextField jFilterTxt = new JTextField(10);
+        JButton jButtonTest = new JButton("Filter");
+        btnPanel.add(jFilterTxt);
+        btnPanel.add(jButtonTest);
+        
+        f.add(btnPanel, BorderLayout.SOUTH);
         jButtonTest.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                subject1.sortChildren();
-                treeDrag.refresh();
+                BstNodeFilter filterNode = new BstNodeFilter();
+                filterNode.addFilter(jFilterTxt.getText());
+                treeDrag.filter(filterNode);
+                treeDrag.expandAllNodes();
             }
         });
 
@@ -350,10 +362,10 @@ public class TestClass {
                 //TestTableWindow();
                 // TestFileSelector();
                 // TestDialog();
-                TestDownload();
+                //TestDownload();
                 //TestListWindow();
                 // TestCheckListWindow();
-                //TestTreeWindow();
+                TestTreeWindow();
                 //TestHotkeyDialog();
                 // TestTreeTableWindow();
                 //CloneControl.probe("C:\\Work\\Dev\\brainstorm_git\\brainstorm3");
